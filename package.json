@@ -1,6 +1,6 @@
 {
   "name": "leaguelogin",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Lost League Manager",
   "main": "src/main/main.js",
   "scripts": {
@@ -46,7 +46,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "lostsarius",
+        "owner": "mauricekleindienst",
         "repo": "lost-league-manager"
       }
     ]
