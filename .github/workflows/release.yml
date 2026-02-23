@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.1.0)'
+        required: true
 
 jobs:
   release:
@@ -24,11 +29,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Set Version from Tag
+      - name: Set Version from Tag or Input
         run: |
-          $TAG = "${{ github.ref_name }}"
-          $VERSION = $TAG -replace "^v", ""
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $VERSION = "${{ github.event.inputs.version }}"
+          } else {
+            $TAG = "${{ github.ref_name }}"
+            $VERSION = $TAG -replace "^v", ""
+          }
           npm version $VERSION --no-git-tag-version --allow-same-version
+          echo "RELEASE_VERSION=$VERSION" >> $env:GITHUB_ENV
         shell: pwsh
 
       - name: Build
@@ -39,6 +49,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ env.RELEASE_VERSION }}
+          name: ${{ env.RELEASE_VERSION }}
           files: |
             dist/*.exe
             dist/*.blockmap
